@@ -1,151 +1,138 @@
 "use client";
 
-import { FormEvent, useState, useTransition } from "react";
-
+import { type FormEvent, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-
-type Profile = {
-  full_name: string | null;
-  phone: string | null;
-  messenger_url: string | null;
-  whatsapp: string | null;
-  preferred_contact_method: string | null;
-} | null;
 
 type ProfileFormProps = {
   userId: string;
-  profile: Profile;
+  profile: {
+    full_name: string | null;
+    phone: string | null;
+    messenger_url: string | null;
+    whatsapp: string | null;
+    preferred_contact_method: string | null;
+  } | null;
 };
 
 export function ProfileForm({ userId, profile }: ProfileFormProps) {
-  const supabase = createClient();
-
-  const [fullName, setFullName] = useState(profile?.full_name ?? "");
-  const [phone, setPhone] = useState(profile?.phone ?? "");
-  const [messengerUrl, setMessengerUrl] = useState(
-    profile?.messenger_url ?? "",
-  );
-  const [whatsapp, setWhatsapp] = useState(profile?.whatsapp ?? "");
-  const [preferredContactMethod, setPreferredContactMethod] = useState(
-    profile?.preferred_contact_method ?? "phone",
-  );
-
   const [message, setMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSave(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
-    setErrorMessage("");
+    setLoading(true);
 
-    startTransition(async () => {
-      const { error } = await supabase.from("profiles").upsert(
-        {
-          id: userId,
-          full_name: fullName.trim() || null,
-          phone: phone.trim() || null,
-          messenger_url: messengerUrl.trim() || null,
-          whatsapp: whatsapp.trim() || null,
-          preferred_contact_method: preferredContactMethod,
-        },
-        {
-          onConflict: "id",
-        },
-      );
+    const formData = new FormData(event.currentTarget);
+    const supabase = createClient();
 
-      if (error) {
-        setErrorMessage(error.message);
-        return;
-      }
+    const { error } = await supabase.from("profiles").upsert(
+      {
+        id: userId,
+        full_name: String(formData.get("full_name") || "").trim() || null,
+        phone: String(formData.get("phone") || "").trim() || null,
+        messenger_url:
+          String(formData.get("messenger_url") || "").trim() || null,
+        whatsapp: String(formData.get("whatsapp") || "").trim() || null,
+        preferred_contact_method:
+          String(formData.get("preferred_contact_method") || "").trim() ||
+          "Messenger",
+      },
+      {
+        onConflict: "id",
+      },
+    );
 
-      setMessage("Profile saved successfully.");
-    });
+    setLoading(false);
+
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    setMessage("Profile saved successfully.");
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div>
-        <label className="text-sm font-bold text-[var(--ad-text)]">
+    <form onSubmit={handleSave} className="grid gap-4">
+      <label className="grid gap-2">
+        <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-muted)]">
           Full name
-        </label>
+        </span>
         <input
-          value={fullName}
-          onChange={(event) => setFullName(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-[var(--ad-border)] bg-white px-4 py-3 text-sm outline-none"
+          name="full_name"
+          defaultValue={profile?.full_name || ""}
+          className="rounded-2xl border border-[var(--ad-border)] bg-[var(--ad-card)] px-4 py-4 outline-none focus:border-[var(--ad-accent)]"
           placeholder="Your full name"
         />
-      </div>
+      </label>
 
-      <div>
-        <label className="text-sm font-bold text-[var(--ad-text)]">
+      <label className="grid gap-2">
+        <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-muted)]">
           Phone
-        </label>
+        </span>
         <input
-          value={phone}
-          onChange={(event) => setPhone(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-[var(--ad-border)] bg-white px-4 py-3 text-sm outline-none"
-          placeholder="+880..."
+          name="phone"
+          defaultValue={profile?.phone || ""}
+          className="rounded-2xl border border-[var(--ad-border)] bg-[var(--ad-card)] px-4 py-4 outline-none focus:border-[var(--ad-accent)]"
+          placeholder="Your phone number"
         />
-      </div>
+      </label>
 
-      <div>
-        <label className="text-sm font-bold text-[var(--ad-text)]">
+      <label className="grid gap-2">
+        <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-muted)]">
           Messenger link
-        </label>
+        </span>
         <input
-          value={messengerUrl}
-          onChange={(event) => setMessengerUrl(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-[var(--ad-border)] bg-white px-4 py-3 text-sm outline-none"
-          placeholder="https://m.me/..."
+          name="messenger_url"
+          defaultValue={profile?.messenger_url || ""}
+          className="rounded-2xl border border-[var(--ad-border)] bg-[var(--ad-card)] px-4 py-4 outline-none focus:border-[var(--ad-accent)]"
+          placeholder="Facebook Messenger profile link"
         />
-      </div>
+      </label>
 
-      <div>
-        <label className="text-sm font-bold text-[var(--ad-text)]">
+      <label className="grid gap-2">
+        <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-muted)]">
           WhatsApp
-        </label>
+        </span>
         <input
-          value={whatsapp}
-          onChange={(event) => setWhatsapp(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-[var(--ad-border)] bg-white px-4 py-3 text-sm outline-none"
-          placeholder="+880..."
+          name="whatsapp"
+          defaultValue={profile?.whatsapp || ""}
+          className="rounded-2xl border border-[var(--ad-border)] bg-[var(--ad-card)] px-4 py-4 outline-none focus:border-[var(--ad-accent)]"
+          placeholder="WhatsApp number"
         />
-      </div>
+      </label>
 
-      <div>
-        <label className="text-sm font-bold text-[var(--ad-text)]">
+      <label className="grid gap-2">
+        <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-muted)]">
           Preferred contact method
-        </label>
+        </span>
         <select
-          value={preferredContactMethod}
-          onChange={(event) => setPreferredContactMethod(event.target.value)}
-          className="mt-2 w-full rounded-2xl border border-[var(--ad-border)] bg-white px-4 py-3 text-sm outline-none"
+          name="preferred_contact_method"
+          defaultValue={profile?.preferred_contact_method || "Messenger"}
+          className="rounded-2xl border border-[var(--ad-border)] bg-[var(--ad-card)] px-4 py-4 outline-none focus:border-[var(--ad-accent)]"
         >
-          <option value="phone">Phone</option>
-          <option value="whatsapp">WhatsApp</option>
-          <option value="messenger">Messenger</option>
+          <option>Messenger</option>
+          <option>WhatsApp</option>
+          <option>Phone</option>
+          <option>Email</option>
         </select>
-      </div>
-
-      {errorMessage ? (
-        <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {errorMessage}
-        </p>
-      ) : null}
+      </label>
 
       {message ? (
-        <p className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        <div className="rounded-2xl border border-[var(--ad-border)] bg-[var(--ad-card)] px-4 py-3 text-sm leading-6 text-[var(--ad-text-soft)]">
           {message}
-        </p>
+        </div>
       ) : null}
 
       <button
         type="submit"
-        disabled={isPending}
-        className="rounded-full bg-[var(--ad-text)] px-6 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white disabled:cursor-not-allowed disabled:opacity-60"
+        disabled={loading}
+        className="mt-2 inline-flex w-full items-center justify-center gap-3 rounded-full bg-[var(--ad-black)] px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-white)] hover:-translate-y-1 hover:bg-[var(--ad-accent-dark)] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isPending ? "Saving..." : "Save profile"}
+        {loading ? "Saving..." : "Save Profile"}
+        <ArrowRight className="h-4 w-4" />
       </button>
     </form>
   );
