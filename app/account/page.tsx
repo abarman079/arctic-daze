@@ -62,6 +62,13 @@ export default async function AccountPage() {
       icon: Bookmark,
     },
     {
+      title: "Pre-Orders",
+      value: overview.preorderCount,
+      text: "Submitted requests and order progress.",
+      href: "/account/preorders",
+      icon: PackageSearch,
+    },
+    {
       title: "Restock Alerts",
       value: overview.restockAlertCount,
       text: "Product availability notifications.",
@@ -89,7 +96,7 @@ export default async function AccountPage() {
         <PendingWishlistHandler />
       </section>
 
-      <section className="mt-6 grid gap-4 md:grid-cols-3">
+      <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((item) => {
           const Icon = item.icon;
 

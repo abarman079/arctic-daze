@@ -184,7 +184,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
               <div className="mt-7 grid gap-3">
                 <Link
-                  href="/#contact"
+                  href={`/products/${product.slug}/preorder`}
                   className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-[var(--ad-black)] px-7 py-4 text-center text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-white)] hover:bg-[var(--ad-accent-dark)]"
                 >
                   Request Pre-Order <ArrowRight className="h-4 w-4" />

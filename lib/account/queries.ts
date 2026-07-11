@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 
 type CountResult = {
   count: number | null;
+
   error: {
     message: string;
   } | null;
@@ -19,7 +20,12 @@ function safeCount(result: CountResult) {
 export async function getAccountOverview(userId: string) {
   const supabase = await createClient();
 
-  const [wishlistResult, draftsResult, restockResult] = await Promise.all([
+  const [
+    wishlistResult,
+    draftsResult,
+    preorderResult,
+    restockResult,
+  ] = await Promise.all([
     supabase
       .from("wishlist_items")
       .select("*", {
@@ -30,6 +36,14 @@ export async function getAccountOverview(userId: string) {
 
     supabase
       .from("saved_order_drafts")
+      .select("*", {
+        count: "exact",
+        head: true,
+      })
+      .eq("user_id", userId),
+
+    supabase
+      .from("preorder_requests")
       .select("*", {
         count: "exact",
         head: true,
@@ -48,6 +62,7 @@ export async function getAccountOverview(userId: string) {
   return {
     wishlistCount: safeCount(wishlistResult),
     savedDraftCount: safeCount(draftsResult),
+    preorderCount: safeCount(preorderResult),
     restockAlertCount: safeCount(restockResult),
   };
 }
