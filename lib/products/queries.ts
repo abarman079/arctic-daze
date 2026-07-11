@@ -9,6 +9,7 @@ import type {
 
 type ProductQueryOptions = {
   categoryId?: string;
+  productIds?: string[];
   limit?: number;
   excludeSlug?: string;
   search?: string;
@@ -132,6 +133,9 @@ export async function getPublicProducts(
   if (options.categoryId) {
     query = query.eq("category_id", options.categoryId);
   }
+  if (options.productIds && options.productIds.length > 0) {
+  query = query.in("id", options.productIds);
+}
 
   if (options.excludeSlug) {
     query = query.neq("slug", options.excludeSlug);

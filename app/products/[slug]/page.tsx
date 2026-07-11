@@ -3,14 +3,13 @@ import {
   CheckCircle2,
   Clock,
   ExternalLink,
-  Heart,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductGrid } from "@/components/products/product-grid";
 import { ProductImage } from "@/components/products/product-image";
 import { getProductBySlug, getPublicProducts } from "@/lib/products/queries";
-
+import { WishlistButton } from "@/components/wishlist/wishlist-button";
 type ProductPageProps = {
   params: Promise<{
     slug: string;
@@ -81,7 +80,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
             Home
           </Link>
           <span>/</span>
-          <Link href="/collections" className="hover:text-[var(--ad-accent-dark)]">
+          <Link
+            href="/collections"
+            className="hover:text-[var(--ad-accent-dark)]"
+          >
             Collections
           </Link>
           {product.category ? (
@@ -155,7 +157,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   {formatPrice(product.price_bdt)}
                 </p>
                 <p className="mt-3 text-sm leading-7 text-[var(--ad-text-soft)]">
-                  Final price and availability are confirmed before order approval.
+                  Final price and availability are confirmed before order
+                  approval.
                 </p>
               </div>
 
@@ -191,12 +194,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   Request Pre-Order <ArrowRight className="h-4 w-4" />
                 </Link>
 
-                <button
-                  type="button"
-                  className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-[var(--ad-border-strong)] bg-[var(--ad-card)] px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-text)] hover:border-[var(--ad-accent)]"
-                >
-                  Save to Wishlist <Heart className="h-4 w-4" />
-                </button>
+                <WishlistButton
+                  productId={product.id}
+                  productTitle={product.title}
+                  variant="full"
+                />
 
                 {product.facebook_url ? (
                   <a
@@ -215,8 +217,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   Pre-order note
                 </p>
                 <p className="mt-2 text-sm leading-7 text-[var(--ad-text-soft)]">
-                  This item is imported by pre-order. Final availability depends on
-                  supplier stock at purchase time.
+                  This item is imported by pre-order. Final availability depends
+                  on supplier stock at purchase time.
                 </p>
               </div>
             </div>

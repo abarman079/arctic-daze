@@ -1,6 +1,8 @@
-import { redirect } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
+import { redirect } from "next/navigation";
+
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { PendingWishlistHandler } from "@/components/wishlist/pending-wishlist-handler";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AccountPage() {
@@ -40,14 +42,17 @@ export default async function AccountPage() {
           <p className="text-xs font-bold uppercase tracking-[0.26em] text-[var(--ad-accent)]">
             Customer Dashboard
           </p>
+
           <h1 className="font-display mt-4 text-[clamp(2.7rem,5.5vw,5.8rem)] font-bold leading-[0.92] tracking-[-0.045em]">
             Your Arctic Daze account.
           </h1>
+
           <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--ad-text-soft)]">
-            This is the first protected dashboard page. Later, this area will
-            show wishlist items, pre-order requests, saved products, profile
-            details, and restock alerts.
+            Manage your profile, wishlist, saved products, pre-order requests,
+            and account details from your Arctic Daze dashboard.
           </p>
+
+          <PendingWishlistHandler />
 
           <div className="mt-10 grid gap-4 md:grid-cols-3">
             {[
@@ -69,9 +74,11 @@ export default async function AccountPage() {
                 className="rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-6"
               >
                 <CheckCircle2 className="h-5 w-5 text-[var(--ad-accent)]" />
+
                 <h2 className="mt-5 text-sm font-bold uppercase tracking-[0.16em]">
                   {item.title}
                 </h2>
+
                 <p className="mt-3 text-sm leading-7 text-[var(--ad-text-soft)]">
                   {item.text}
                 </p>
@@ -88,9 +95,12 @@ export default async function AccountPage() {
             Edit your contact profile
           </a>
 
-          <div className="rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-6 text-sm font-semibold text-[var(--ad-text-soft)]">
-            Wishlist coming in Phase 4
-          </div>
+          <a
+            href="/account/wishlist"
+            className="rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-6 text-sm font-semibold text-[var(--ad-text-soft)] hover:-translate-y-1 hover:border-[var(--ad-accent)]"
+          >
+            View your wishlist
+          </a>
 
           <div className="rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-6 text-sm font-semibold text-[var(--ad-text-soft)]">
             Pre-order requests coming in Phase 5

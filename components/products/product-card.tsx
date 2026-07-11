@@ -1,3 +1,4 @@
+import { WishlistButton } from "@/components/wishlist/wishlist-button";
 import { ArrowRight, Clock, Heart, MapPin } from "lucide-react";
 import Link from "next/link";
 import type { ProductListItem } from "@/lib/products/types";
@@ -20,7 +21,8 @@ function formatStatus(status: string) {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const coverImage = product.images[0]?.stored_url || "/editorial/community.png";
+  const coverImage =
+    product.images[0]?.stored_url || "/editorial/community.png";
   const hoverImage = product.images[1]?.stored_url || coverImage;
 
   return (
@@ -55,24 +57,13 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </Link>
 
-      <button
-        type="button"
-        aria-label={`Save ${product.title}`}
-        className="absolute sr-only"
-      />
 
       <div className="p-4 sm:p-5">
         <div className="flex items-center justify-between gap-3">
           <p className="min-w-0 truncate text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ad-muted)]">
             {product.category?.name || "Men’s Lifestyle"}
           </p>
-          <button
-            type="button"
-            aria-label={`Save ${product.title}`}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--ad-border)] bg-[var(--ad-card-2)] text-[var(--ad-text)] hover:border-[var(--ad-accent)] hover:text-[var(--ad-accent-dark)]"
-          >
-            <Heart className="h-4 w-4" />
-          </button>
+          <WishlistButton productId={product.id} productTitle={product.title} />
         </div>
 
         <h3 className="mt-3 min-h-14 break-words font-display text-2xl font-bold leading-[0.98] tracking-[-0.03em] text-[var(--ad-text)] sm:min-h-16 sm:text-3xl">
