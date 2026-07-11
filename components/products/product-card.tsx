@@ -1,8 +1,14 @@
 import { WishlistButton } from "@/components/wishlist/wishlist-button";
-import { ArrowRight, Clock, Heart, MapPin } from "lucide-react";
-import Link from "next/link";
-import type { ProductListItem } from "@/lib/products/types";
 import { ProductImage } from "@/components/products/product-image";
+import { ArrowRight, Clock, MapPin } from "lucide-react";
+import Link from "next/link";
+
+import {
+  formatProductStatus,
+  getUnavailableProductCopy,
+  isProductUnavailable,
+} from "@/lib/products/status";
+import type { ProductListItem } from "@/lib/products/types";
 
 type ProductCardProps = {
   product: ProductListItem;
@@ -10,20 +16,21 @@ type ProductCardProps = {
 
 function formatPrice(value: number | null) {
   if (!value) return "Quote on request";
-  return `৳${value.toLocaleString("en-BD")}`;
-}
 
-function formatStatus(status: string) {
-  if (status === "pre_order") return "Pre-order";
-  if (status === "in_stock") return "In stock";
-  if (status === "sold_out") return "Sold out";
-  return status.replaceAll("_", " ");
+  return `৳${value.toLocaleString("en-BD")}`;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
   const coverImage =
     product.images[0]?.stored_url || "/editorial/community.png";
+
   const hoverImage = product.images[1]?.stored_url || coverImage;
+
+  const unavailable = isProductUnavailable(product.status);
+
+  const availabilityCopy = unavailable
+    ? getUnavailableProductCopy(product.status)
+    : null;
 
   return (
     <article className="ad-lift group min-w-0 overflow-hidden rounded-[1.35rem] border border-[var(--ad-border)] bg-[var(--ad-card)] shadow-[var(--shadow-soft)] sm:rounded-[1.75rem]">
@@ -52,18 +59,21 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-[rgba(23,20,17,0.18)] via-transparent to-transparent" />
 
           <div className="absolute left-3 top-3 rounded-full bg-[rgba(255,250,242,0.92)] px-3 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ad-accent-dark)] backdrop-blur-md">
-            {formatStatus(product.status)}
+            {formatProductStatus(product.status)}
           </div>
         </div>
       </Link>
-
 
       <div className="p-4 sm:p-5">
         <div className="flex items-center justify-between gap-3">
           <p className="min-w-0 truncate text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ad-muted)]">
             {product.category?.name || "Men’s Lifestyle"}
           </p>
-          <WishlistButton productId={product.id} productTitle={product.title} />
+
+          <WishlistButton
+            productId={product.id}
+            productTitle={product.title}
+          />
         </div>
 
         <h3 className="mt-3 min-h-14 break-words font-display text-2xl font-bold leading-[0.98] tracking-[-0.03em] text-[var(--ad-text)] sm:min-h-16 sm:text-3xl">
@@ -73,13 +83,20 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="mt-4 grid gap-2 text-sm text-[var(--ad-text-soft)]">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 shrink-0 text-[var(--ad-accent)]" />
+
             <span className="min-w-0 truncate">
-              ETA: {product.preorder_eta || "Quote first"}
+              {unavailable
+                ? availabilityCopy?.timing
+                : `ETA: ${product.preorder_eta || "Quote first"}`}
             </span>
           </div>
+
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 shrink-0 text-[var(--ad-accent)]" />
-            <span className="min-w-0 truncate">Malaysia source reference</span>
+
+            <span className="min-w-0 truncate">
+              Malaysia source reference
+            </span>
           </div>
         </div>
 
@@ -88,6 +105,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ad-muted)]">
               Starting from
             </p>
+
             <p className="mt-1 text-lg font-bold text-[var(--ad-text)]">
               {formatPrice(product.price_bdt)}
             </p>

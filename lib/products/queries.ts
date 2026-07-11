@@ -1,4 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import {
+  PUBLIC_PRODUCT_STATUSES,
+  type PublicProductStatus,
+} from "@/lib/products/status";
 import type {
   ProductCategory,
   ProductDetail,
@@ -13,7 +17,7 @@ type ProductQueryOptions = {
   limit?: number;
   excludeSlug?: string;
   search?: string;
-  status?: "pre_order" | "in_stock";
+  status?: PublicProductStatus;
   sort?: "newest" | "price-asc" | "price-desc";
 };
 
@@ -127,15 +131,15 @@ export async function getPublicProducts(
   if (options.status) {
     query = query.eq("status", options.status);
   } else {
-    query = query.in("status", ["pre_order", "in_stock"]);
+    query = query.in("status", [...PUBLIC_PRODUCT_STATUSES]);
   }
 
   if (options.categoryId) {
     query = query.eq("category_id", options.categoryId);
   }
   if (options.productIds && options.productIds.length > 0) {
-  query = query.in("id", options.productIds);
-}
+    query = query.in("id", options.productIds);
+  }
 
   if (options.excludeSlug) {
     query = query.neq("slug", options.excludeSlug);
@@ -185,7 +189,7 @@ export async function getProductBySlug(
     .from("products")
     .select(productSelect)
     .eq("slug", slug)
-    .in("status", ["pre_order", "in_stock"])
+    .in("status", [...PUBLIC_PRODUCT_STATUSES])
     .not("published_at", "is", null)
     .maybeSingle();
 

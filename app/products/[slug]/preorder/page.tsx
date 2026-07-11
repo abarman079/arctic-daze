@@ -1,9 +1,11 @@
 import { ArrowLeft, CheckCircle2, Clock } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+
 import { PreorderRequestForm } from "@/components/preorders/preorder-request-form";
 import { ProductImage } from "@/components/products/product-image";
 import { getProductBySlug } from "@/lib/products/queries";
+import { isProductUnavailable } from "@/lib/products/status";
 import { createClient } from "@/lib/supabase/server";
 
 type ProductPreorderPageProps = {
@@ -41,6 +43,10 @@ export default async function ProductPreorderPage({
 
   if (!product) {
     notFound();
+  }
+
+  if (isProductUnavailable(product.status)) {
+    redirect(`/products/${product.slug}`);
   }
 
   const { data: profile } = await supabase
@@ -106,7 +112,9 @@ export default async function ProductPreorderPage({
                     <Clock className="mt-0.5 h-5 w-5 shrink-0 text-[var(--ad-accent)]" />
 
                     <div>
-                      <p className="text-sm font-bold">Estimated delivery</p>
+                      <p className="text-sm font-bold">
+                        Estimated delivery
+                      </p>
 
                       <p className="mt-1 text-sm text-[var(--ad-text-soft)]">
                         {product.preorder_eta ||
@@ -119,7 +127,9 @@ export default async function ProductPreorderPage({
                     <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[var(--ad-accent)]" />
 
                     <div>
-                      <p className="text-sm font-bold">Advance payment</p>
+                      <p className="text-sm font-bold">
+                        Advance payment
+                      </p>
 
                       <p className="mt-1 text-sm text-[var(--ad-text-soft)]">
                         {product.advance_required

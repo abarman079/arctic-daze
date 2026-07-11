@@ -9,7 +9,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
+import {
+  BellRing,
+  Bookmark,
+  Heart,
+  LayoutDashboard,
+  PackageSearch,
+  UserRound,
+} from "lucide-react";
 const accountLinks = [
   {
     label: "Overview",
@@ -30,6 +37,11 @@ const accountLinks = [
     label: "Pre-Orders",
     href: "/account/preorders",
     icon: PackageSearch,
+  },
+  {
+    label: "Restock Alerts",
+    href: "/account/restock-alerts",
+    icon: BellRing,
   },
   {
     label: "Profile",

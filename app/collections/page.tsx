@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { ProductGrid } from "@/components/products/product-grid";
 import {
-  getActiveCategories,
-  getPublicProducts,
-} from "@/lib/products/queries";
+  formatProductStatus,
+  isPublicProductStatus,
+  PUBLIC_PRODUCT_STATUSES,
+} from "@/lib/products/status";
+import { getActiveCategories, getPublicProducts } from "@/lib/products/queries";
 
 type CollectionsPageProps = {
   searchParams?: Promise<{
@@ -14,8 +16,8 @@ type CollectionsPageProps = {
   }>;
 };
 
-function isValidStatus(value?: string): value is "pre_order" | "in_stock" {
-  return value === "pre_order" || value === "in_stock";
+function isValidStatus(value?: string) {
+  return isPublicProductStatus(value);
 }
 
 function isValidSort(
@@ -74,13 +76,16 @@ export default async function CollectionsPage({
             Browse men’s drops selected for Arctic Daze.
           </h1>
           <p className="mt-7 max-w-2xl text-base leading-8 text-[var(--ad-text-soft)] sm:text-lg">
-            Search products, filter by category, compare prices, and open product
-            details before sending your pre-order request.
+            Search products, filter by category, compare prices, and open
+            product details before sending your pre-order request.
           </p>
         </section>
 
         <section className="mb-8 rounded-[2rem] border border-[var(--ad-border)] bg-[var(--ad-card)] p-5 shadow-[var(--shadow-soft)] sm:p-6">
-          <form action="/collections" className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr_0.7fr_0.7fr_auto]">
+          <form
+            action="/collections"
+            className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr_0.7fr_0.7fr_auto]"
+          >
             <label className="grid gap-2">
               <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-muted)]">
                 Search
@@ -120,9 +125,13 @@ export default async function CollectionsPage({
                 defaultValue={status || ""}
                 className="h-12 rounded-2xl border border-[var(--ad-border)] bg-[var(--ad-card-2)] px-4 text-sm outline-none focus:border-[var(--ad-accent)]"
               >
-                <option value="">All</option>
-                <option value="pre_order">Pre-order</option>
-                <option value="in_stock">In stock</option>
+                <option value="">All statuses</option>
+
+                {PUBLIC_PRODUCT_STATUSES.map((productStatus) => (
+                  <option key={productStatus} value={productStatus}>
+                    {formatProductStatus(productStatus)}
+                  </option>
+                ))}
               </select>
             </label>
 

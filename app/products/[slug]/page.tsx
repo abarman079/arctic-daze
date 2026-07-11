@@ -1,11 +1,13 @@
-import { SaveDraftButton } from "@/components/saved-items/save-draft-button";
-import { ArrowRight, CheckCircle2, Clock, ExternalLink } from "lucide-react";
+import { CheckCircle2, Clock } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+import { ProductAvailabilityActions } from "@/components/products/product-availability-actions";
 import { ProductGrid } from "@/components/products/product-grid";
 import { ProductImage } from "@/components/products/product-image";
 import { getProductBySlug, getPublicProducts } from "@/lib/products/queries";
-import { WishlistButton } from "@/components/wishlist/wishlist-button";
+import { formatProductStatus } from "@/lib/products/status";
+
 type ProductPageProps = {
   params: Promise<{
     slug: string;
@@ -14,16 +16,13 @@ type ProductPageProps = {
 
 function formatPrice(value: number | null) {
   if (!value) return "Quote on request";
+
   return `৳${value.toLocaleString("en-BD")}`;
 }
 
-function formatStatus(status: string) {
-  if (status === "pre_order") return "Pre-order";
-  if (status === "in_stock") return "In stock";
-  return status.replaceAll("_", " ");
-}
-
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({
+  params,
+}: ProductPageProps) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
 
@@ -72,19 +71,26 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </header>
 
         <nav className="mb-6 flex flex-wrap gap-2 text-sm text-[var(--ad-text-soft)]">
-          <Link href="/" className="hover:text-[var(--ad-accent-dark)]">
+          <Link
+            href="/"
+            className="hover:text-[var(--ad-accent-dark)]"
+          >
             Home
           </Link>
+
           <span>/</span>
+
           <Link
             href="/collections"
             className="hover:text-[var(--ad-accent-dark)]"
           >
             Collections
           </Link>
+
           {product.category ? (
             <>
               <span>/</span>
+
               <Link
                 href={`/category/${product.category.slug}`}
                 className="hover:text-[var(--ad-accent-dark)]"
@@ -130,8 +136,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="paper-panel min-w-0 rounded-[2rem] border border-[var(--ad-border)] p-6 shadow-[var(--shadow-soft)] sm:p-8 lg:p-10">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full border border-[var(--ad-border)] bg-[var(--ad-card)] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-accent-dark)]">
-                  {formatStatus(product.status)}
+                  {formatProductStatus(product.status)}
                 </span>
+
                 <span className="rounded-full border border-[var(--ad-border)] bg-[var(--ad-card)] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-text-soft)]">
                   {product.category?.name || "Men’s Lifestyle"}
                 </span>
@@ -149,9 +156,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-muted)]">
                   Starting from
                 </p>
+
                 <p className="mt-2 text-3xl font-bold text-[var(--ad-text)]">
                   {formatPrice(product.price_bdt)}
                 </p>
+
                 <p className="mt-3 text-sm leading-7 text-[var(--ad-text-soft)]">
                   Final price and availability are confirmed before order
                   approval.
@@ -161,18 +170,27 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div className="mt-5 grid gap-3">
                 <div className="flex items-start gap-3 rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-5">
                   <Clock className="mt-0.5 h-5 w-5 shrink-0 text-[var(--ad-accent)]" />
+
                   <div className="min-w-0">
-                    <p className="text-sm font-bold">Estimated delivery</p>
+                    <p className="text-sm font-bold">
+                      Estimated delivery
+                    </p>
+
                     <p className="mt-1 text-sm text-[var(--ad-text-soft)]">
-                      {product.preorder_eta || "Confirmed during quote"}
+                      {product.preorder_eta ||
+                        "Confirmed during quote"}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-5">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[var(--ad-accent)]" />
+
                   <div className="min-w-0">
-                    <p className="text-sm font-bold">Advance payment</p>
+                    <p className="text-sm font-bold">
+                      Advance payment
+                    </p>
+
                     <p className="mt-1 text-sm text-[var(--ad-text-soft)]">
                       {product.advance_required
                         ? "Required after quote confirmation."
@@ -182,45 +200,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </div>
               </div>
 
-              <div className="mt-7 grid gap-3">
-                <Link
-                  href={`/products/${product.slug}/preorder`}
-                  className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-[var(--ad-black)] px-7 py-4 text-center text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-white)] hover:bg-[var(--ad-accent-dark)]"
-                >
-                  Request Pre-Order <ArrowRight className="h-4 w-4" />
-                </Link>
-
-                <WishlistButton
-                  productId={product.id}
-                  productTitle={product.title}
-                  variant="full"
-                />
-                <SaveDraftButton
-                  productId={product.id}
-                  productSlug={product.slug}
-                />
-
-                {product.facebook_url ? (
-                  <a
-                    href={product.facebook_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-[var(--ad-border)] bg-[var(--ad-card)] px-7 py-4 text-center text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-text-soft)] hover:border-[var(--ad-accent)]"
-                  >
-                    View Facebook Post <ExternalLink className="h-4 w-4" />
-                  </a>
-                ) : null}
-              </div>
-
-              <div className="mt-7 rounded-3xl bg-[var(--ad-accent-soft)] p-5">
-                <p className="text-sm font-bold text-[var(--ad-text)]">
-                  Pre-order note
-                </p>
-                <p className="mt-2 text-sm leading-7 text-[var(--ad-text-soft)]">
-                  This item is imported by pre-order. Final availability depends
-                  on supplier stock at purchase time.
-                </p>
-              </div>
+              <ProductAvailabilityActions product={product} />
             </div>
           </aside>
         </section>
@@ -230,6 +210,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-[var(--ad-muted)]">
               Similar products
             </p>
+
             <h2 className="font-display mt-2 text-4xl font-bold tracking-[-0.04em]">
               More from this category
             </h2>

@@ -72,7 +72,7 @@ export default async function AccountPage() {
       title: "Restock Alerts",
       value: overview.restockAlertCount,
       text: "Product availability notifications.",
-      href: "/collections",
+      href: "/account/restock-alerts",
       icon: BellRing,
     },
   ];
