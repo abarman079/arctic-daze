@@ -1,214 +1,68 @@
-import { ArrowRight, CheckCircle2, Clock, ExternalLink, Heart } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductGrid } from "@/components/products/product-grid";
-import { getProductBySlug, getPublicProducts } from "@/lib/products/queries";
+import { getCategoryBySlug, getPublicProducts } from "@/lib/products/queries";
 
-type ProductPageProps = {
+type CategoryPageProps = {
   params: Promise<{
     slug: string;
   }>;
 };
 
-function formatPrice(value: number | null) {
-  if (!value) return "Quote on request";
-  return `৳${value.toLocaleString("en-BD")}`;
-}
-
-function formatStatus(status: string) {
-  if (status === "pre_order") return "Pre-order";
-  if (status === "in_stock") return "In stock";
-  return status.replaceAll("_", " ");
-}
-
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const category = await getCategoryBySlug(slug);
 
-  if (!product) {
+  if (!category) {
     notFound();
   }
 
-  const images =
-    product.images.length > 0
-      ? product.images
-      : [
-          {
-            id: "fallback",
-            stored_url: "/editorial/arctic-daze-flatlay-community.png",
-            alt: product.title,
-            position: 0,
-            status: "stored",
-          },
-        ];
-
-  const similarProducts = product.category?.id
-    ? await getPublicProducts({
-        categoryId: product.category.id,
-        excludeSlug: product.slug,
-        limit: 4,
-      })
-    : [];
+  const products = await getPublicProducts({
+    categoryId: category.id,
+  });
 
   return (
-    <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12">
+    <main className="min-h-screen overflow-x-hidden px-5 py-8 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-[1440px]">
-        <header className="mb-8 flex flex-col justify-between gap-5 border-b border-[var(--ad-border)] pb-8 sm:flex-row sm:items-center">
+        <header className="flex flex-col justify-between gap-5 border-b border-[var(--ad-border)] pb-8 sm:flex-row sm:items-center">
           <Link href="/" className="font-display text-2xl font-bold tracking-[0.16em]">
             ARCTIC DAZE
           </Link>
 
-          <Link
-            href="/collections"
-            className="rounded-full border border-[var(--ad-border)] bg-[var(--ad-card)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-text-soft)] hover:border-[var(--ad-accent)]"
-          >
-            Back to Collections
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/collections"
+              className="rounded-full border border-[var(--ad-border)] bg-[var(--ad-card)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-text-soft)] hover:border-[var(--ad-accent)]"
+            >
+              All Products
+            </Link>
+            <Link
+              href="/#contact"
+              className="rounded-full bg-[var(--ad-black)] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-white)] hover:bg-[var(--ad-accent-dark)]"
+            >
+              Request Item
+            </Link>
+          </div>
         </header>
 
-        <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="grid gap-4">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-[var(--ad-border)] bg-[var(--ad-card-2)] shadow-[var(--shadow-soft)] lg:aspect-[5/6]">
-              <Image
-                src={images[0].stored_url}
-                alt={images[0].alt || product.title}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 58vw"
-                className="object-cover"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {images.slice(0, 4).map((image) => (
-                <div
-                  key={image.id}
-                  className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card-2)]"
-                >
-                  <Image
-                    src={image.stored_url}
-                    alt={image.alt || product.title}
-                    fill
-                    sizes="(max-width: 1024px) 25vw, 14vw"
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <aside className="lg:sticky lg:top-28 lg:self-start">
-            <div className="paper-panel rounded-[2rem] border border-[var(--ad-border)] p-7 shadow-[var(--shadow-soft)] sm:p-10">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full border border-[var(--ad-border)] bg-[var(--ad-card)] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-accent-dark)]">
-                  {formatStatus(product.status)}
-                </span>
-                <span className="rounded-full border border-[var(--ad-border)] bg-[var(--ad-card)] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-text-soft)]">
-                  {product.category?.name || "Men’s Lifestyle"}
-                </span>
-              </div>
-
-              <h1 className="font-display mt-6 text-[clamp(2.8rem,5vw,5.4rem)] font-bold leading-[0.9] tracking-[-0.055em]">
-                {product.title}
-              </h1>
-
-              <p className="mt-5 text-base leading-8 text-[var(--ad-text-soft)]">
-                {product.description}
-              </p>
-
-              <div className="mt-7 rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-5">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-muted)]">
-                  Starting from
-                </p>
-                <p className="mt-2 text-3xl font-bold text-[var(--ad-text)]">
-                  {formatPrice(product.price_bdt)}
-                </p>
-                <p className="mt-3 text-sm leading-7 text-[var(--ad-text-soft)]">
-                  Final price and availability are confirmed before order approval.
-                </p>
-              </div>
-
-              <div className="mt-5 grid gap-3">
-                <div className="flex items-start gap-3 rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-5">
-                  <Clock className="mt-0.5 h-5 w-5 text-[var(--ad-accent)]" />
-                  <div>
-                    <p className="text-sm font-bold">Estimated delivery</p>
-                    <p className="mt-1 text-sm text-[var(--ad-text-soft)]">
-                      {product.preorder_eta || "Confirmed during quote"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-5">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 text-[var(--ad-accent)]" />
-                  <div>
-                    <p className="text-sm font-bold">Advance payment</p>
-                    <p className="mt-1 text-sm text-[var(--ad-text-soft)]">
-                      {product.advance_required
-                        ? "Required after quote confirmation."
-                        : "Not required for this item."}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-7 grid gap-3">
-                <Link
-                  href="/#contact"
-                  className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-[var(--ad-black)] px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-white)] hover:bg-[var(--ad-accent-dark)]"
-                >
-                  Request Pre-Order <ArrowRight className="h-4 w-4" />
-                </Link>
-
-                <button
-                  type="button"
-                  className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-[var(--ad-border-strong)] bg-[var(--ad-card)] px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-text)] hover:border-[var(--ad-accent)]"
-                >
-                  Save to Wishlist <Heart className="h-4 w-4" />
-                </button>
-
-                {product.facebook_url ? (
-                  <a
-                    href={product.facebook_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-[var(--ad-border)] bg-[var(--ad-card)] px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-text-soft)] hover:border-[var(--ad-accent)]"
-                  >
-                    View Facebook Post <ExternalLink className="h-4 w-4" />
-                  </a>
-                ) : null}
-              </div>
-
-              <div className="mt-7 rounded-3xl bg-[var(--ad-accent-soft)] p-5">
-                <p className="text-sm font-bold text-[var(--ad-text)]">
-                  Pre-order note
-                </p>
-                <p className="mt-2 text-sm leading-7 text-[var(--ad-text-soft)]">
-                  This item is imported by pre-order. Final availability depends on
-                  supplier stock at purchase time.
-                </p>
-              </div>
-            </div>
-          </aside>
+        <section className="paper-panel my-8 rounded-[2rem] border border-[var(--ad-border)] p-7 shadow-[var(--shadow-soft)] sm:p-10 lg:p-14">
+          <p className="text-xs font-bold uppercase tracking-[0.26em] text-[var(--ad-accent)]">
+            Category
+          </p>
+          <h1 className="font-display mt-4 break-words text-[clamp(3rem,7vw,7.2rem)] font-bold leading-[0.9] tracking-[-0.055em]">
+            {category.name}
+          </h1>
+          <p className="mt-7 max-w-2xl text-base leading-8 text-[var(--ad-text-soft)] sm:text-lg">
+            {category.description ||
+              "Browse selected Arctic Daze products in this category."}
+          </p>
         </section>
 
-        <section className="mt-16 border-t border-[var(--ad-border)] pt-10">
-          <div className="mb-6">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[var(--ad-muted)]">
-              Similar products
-            </p>
-            <h2 className="font-display mt-2 text-4xl font-bold tracking-[-0.04em]">
-              More from this category
-            </h2>
-          </div>
-
-          <ProductGrid
-            products={similarProducts}
-            emptyTitle="No similar products yet."
-            emptyText="More products from this category will appear here as the catalogue grows."
-          />
-        </section>
+        <ProductGrid
+          products={products}
+          emptyTitle="No products in this category yet."
+          emptyText="New drops are added from our Facebook page and supported Malaysian store requests."
+        />
       </div>
     </main>
   );

@@ -11,6 +11,9 @@ type ProductQueryOptions = {
   categoryId?: string;
   limit?: number;
   excludeSlug?: string;
+  search?: string;
+  status?: "pre_order" | "in_stock";
+  sort?: "newest" | "price-asc" | "price-desc";
 };
 
 function toNumber(value: unknown) {
@@ -23,7 +26,6 @@ function normalizeCategory(category: unknown): ProductCategory {
   if (!category || typeof category !== "object") return null;
 
   const value = Array.isArray(category) ? category[0] : category;
-
   if (!value || typeof value !== "object") return null;
 
   const item = value as {
@@ -107,6 +109,10 @@ const productSelect = `
   )
 `;
 
+function cleanSearch(value?: string) {
+  return (value || "").trim().replaceAll("%", "").replaceAll(",", "");
+}
+
 export async function getPublicProducts(
   options: ProductQueryOptions = {},
 ): Promise<ProductListItem[]> {
@@ -115,9 +121,13 @@ export async function getPublicProducts(
   let query = supabase
     .from("products")
     .select(productSelect)
-    .in("status", ["pre_order", "in_stock"])
-    .not("published_at", "is", null)
-    .order("created_at", { ascending: false });
+    .not("published_at", "is", null);
+
+  if (options.status) {
+    query = query.eq("status", options.status);
+  } else {
+    query = query.in("status", ["pre_order", "in_stock"]);
+  }
 
   if (options.categoryId) {
     query = query.eq("category_id", options.categoryId);
@@ -127,6 +137,20 @@ export async function getPublicProducts(
     query = query.neq("slug", options.excludeSlug);
   }
 
+  const search = cleanSearch(options.search);
+
+  if (search) {
+    query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+  }
+
+  if (options.sort === "price-asc") {
+    query = query.order("price_bdt", { ascending: true, nullsFirst: false });
+  } else if (options.sort === "price-desc") {
+    query = query.order("price_bdt", { ascending: false, nullsFirst: false });
+  } else {
+    query = query.order("created_at", { ascending: false });
+  }
+
   if (options.limit) {
     query = query.limit(options.limit);
   }
@@ -134,7 +158,12 @@ export async function getPublicProducts(
   const { data, error } = await query;
 
   if (error) {
-    console.error("getPublicProducts error:", error.message);
+    console.error("getPublicProducts error:", {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    });
     return [];
   }
 
@@ -157,7 +186,13 @@ export async function getProductBySlug(
     .maybeSingle();
 
   if (error) {
-    console.error("getProductBySlug error:", error.message);
+    console.error("getProductBySlug error:", {
+      slug,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    });
     return null;
   }
 
@@ -177,9 +212,37 @@ export async function getCategoryBySlug(slug: string) {
     .maybeSingle();
 
   if (error) {
-    console.error("getCategoryBySlug error:", error.message);
+    console.error("getCategoryBySlug error:", {
+      slug,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    });
     return null;
   }
 
   return data;
+}
+
+export async function getActiveCategories() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("categories")
+    .select("id, name, slug, parent_id, sort_order")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    console.error("getActiveCategories error:", {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    });
+    return [];
+  }
+
+  return data || [];
 }

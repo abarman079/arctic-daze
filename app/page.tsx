@@ -22,7 +22,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 const navItems = [
-  { label: "Collections", href: "#collections" },
+  { label: "Shop", href: "/collections" },
   { label: "How to Order", href: "#process" },
   { label: "Stores", href: "#stores" },
   { label: "Why Us", href: "#why-us" },
@@ -40,41 +40,49 @@ const collections = [
     title: "Hoodies",
     note: "Layered comfort for daily wear.",
     image: "/editorial/hoodie-1.png",
+    href: "/category/men-hoodies-sweatshirts",
   },
   {
     title: "Polos",
     note: "Clean fits for casual and smart looks.",
-    image: "/editorial/polo-1.png",
+    image: "/editorial/polo-3.png",
+    href: "/category/men-shirts-polos",
   },
   {
     title: "Sneakers",
     note: "Everyday icons and statement pairs.",
     image: "/editorial/shoe-1.png",
+    href: "/category/sneakers",
   },
   {
     title: "Fragrance",
     note: "Signature scents and daily essentials.",
     image: "/editorial/fragrance-3.png",
+    href: "/category/fragrance-cologne",
   },
   {
     title: "Premium Layers",
     note: "Warm pieces with refined texture.",
     image: "/editorial/hoodie-2.png",
+    href: "/category/men-hoodies-sweatshirts",
   },
   {
     title: "Smart Casual",
     note: "Relaxed clothing with a polished finish.",
     image: "/editorial/polo-2.png",
+    href: "/category/men-shirts-polos",
   },
   {
     title: "Footwear",
     note: "Loafers, sneakers, slides, and seasonal picks.",
     image: "/editorial/shoe-2.png",
+    href: "/category/sneakers",
   },
   {
     title: "Grooming",
     note: "Personal care, fragrance, and finishing details.",
-    image: "/editorial/fragrance-1.png",
+    image: "/editorial/fragrance-3.png",
+    href: "/category/daily-essentials",
   },
 ];
 
@@ -153,11 +161,21 @@ const orderSteps = [
 const storeGroups = [
   {
     title: "Fashion",
-    stores: ["SHEIN Malaysia", "Zalora Malaysia", "H&M Malaysia", "UNIQLO Malaysia"],
+    stores: [
+      "SHEIN Malaysia",
+      "Zalora Malaysia",
+      "H&M Malaysia",
+      "UNIQLO Malaysia",
+    ],
   },
   {
     title: "Sports",
-    stores: ["Adidas Malaysia", "Nike Malaysia", "Puma Malaysia", "Under Armour Malaysia"],
+    stores: [
+      "Adidas Malaysia",
+      "Nike Malaysia",
+      "Puma Malaysia",
+      "Under Armour Malaysia",
+    ],
   },
   {
     title: "Marketplaces",
@@ -165,7 +183,12 @@ const storeGroups = [
   },
   {
     title: "Accessories",
-    stores: ["Fossil Malaysia", "Casio Malaysia", "Seiko Malaysia", "Ray-Ban Malaysia"],
+    stores: [
+      "Fossil Malaysia",
+      "Casio Malaysia",
+      "Seiko Malaysia",
+      "Ray-Ban Malaysia",
+    ],
   },
   {
     title: "Grooming & Perfume",
@@ -207,7 +230,13 @@ const footerColumns = [
   },
   {
     title: "Customer Care",
-    links: ["How to Order", "Pre-Order Policy", "Returns", "Size Guide", "FAQs"],
+    links: [
+      "How to Order",
+      "Pre-Order Policy",
+      "Returns",
+      "Size Guide",
+      "FAQs",
+    ],
   },
   {
     title: "About",
@@ -355,17 +384,17 @@ export default function Home() {
             </h1>
 
             <p className="mt-8 max-w-2xl text-base leading-8 text-[var(--ad-text-soft)] sm:text-lg">
-              Curated menswear, sneakers, watches, fragrance, grooming, and daily
-              essentials — sourced from trusted Malaysian stores and brought to
-              Bangladesh through Arctic Daze.
+              Curated menswear, sneakers, watches, fragrance, grooming, and
+              daily essentials — sourced from trusted Malaysian stores and
+              brought to Bangladesh through Arctic Daze.
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <a
-                href="#stores"
+                href="/collections"
                 className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-[var(--ad-black)] px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-white)] hover:-translate-y-1 hover:bg-[var(--ad-accent-dark)] sm:w-auto"
               >
-                Browse Malaysian Stores <ArrowRight className="h-4 w-4" />
+                Browse Products <ArrowRight className="h-4 w-4" />
               </a>
               <a
                 href="#contact"
@@ -376,8 +405,8 @@ export default function Home() {
             </div>
 
             <p className="mt-6 max-w-2xl rounded-3xl border border-[var(--ad-border)] bg-[rgba(255,250,242,0.72)] px-5 py-4 text-sm leading-7 text-[var(--ad-text-soft)]">
-              Send us the product link. We check availability, quote clearly, and
-              guide your pre-order.
+              Send us the product link. We check availability, quote clearly,
+              and guide your pre-order.
             </p>
 
             <div className="mt-8 grid gap-3 border-t border-[var(--ad-border)] pt-6 sm:grid-cols-3">
@@ -414,14 +443,16 @@ export default function Home() {
 
       <section className="border-y border-[var(--ad-border)] bg-[var(--ad-card)] py-5">
         <div className="marquee-track flex gap-4">
-          {[...marqueeLabels, ...marqueeLabels, ...marqueeLabels].map((item, index) => (
-            <span
-              key={`${item}-${index}`}
-              className="rounded-full border border-[var(--ad-border)] bg-[var(--ad-card-2)] px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-text-soft)]"
-            >
-              {item}
-            </span>
-          ))}
+          {[...marqueeLabels, ...marqueeLabels, ...marqueeLabels].map(
+            (item, index) => (
+              <span
+                key={`${item}-${index}`}
+                className="rounded-full border border-[var(--ad-border)] bg-[var(--ad-card-2)] px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-text-soft)]"
+              >
+                {item}
+              </span>
+            ),
+          )}
         </div>
       </section>
 
@@ -445,14 +476,15 @@ export default function Home() {
               A sharper way to shop men’s essentials from Malaysia.
             </h2>
             <p className="mt-7 text-base leading-8 text-[var(--ad-text-soft)] sm:text-lg">
-              Arctic Daze is a men-focused import-commerce service built for customers
-              in Bangladesh who want access to selected Malaysian fashion, footwear,
-              fragrance, grooming, and lifestyle products without the confusion of
-              international ordering.
+              Arctic Daze is a men-focused import-commerce service built for
+              customers in Bangladesh who want access to selected Malaysian
+              fashion, footwear, fragrance, grooming, and lifestyle products
+              without the confusion of international ordering.
             </p>
             <p className="mt-5 text-base leading-8 text-[var(--ad-text-soft)] sm:text-lg">
-              You choose the item. We check the source, confirm availability, prepare
-              a transparent quote, and guide the pre-order from request to delivery.
+              You choose the item. We check the source, confirm availability,
+              prepare a transparent quote, and guide the pre-order from request
+              to delivery.
             </p>
 
             <div className="mt-9 grid gap-4 md:grid-cols-3">
@@ -488,7 +520,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="collections" className="px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+      <section
+        id="collections"
+        className="px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28"
+      >
         <div className="mx-auto max-w-[1440px]">
           <div className="mb-10 flex flex-col justify-between gap-5 border-t border-[var(--ad-border)] pt-8 lg:flex-row lg:items-end">
             <div>
@@ -500,9 +535,9 @@ export default function Home() {
               </h2>
             </div>
             <p className="max-w-xl text-base leading-7 text-[var(--ad-text-soft)]">
-              From everyday hoodies and polos to sneakers, fragrance, grooming, and
-              accessories — every category is built around practical style, clean
-              presentation, and reliable pre-order sourcing.
+              From everyday hoodies and polos to sneakers, fragrance, grooming,
+              and accessories — every category is built around practical style,
+              clean presentation, and reliable pre-order sourcing.
             </p>
           </div>
 
@@ -523,19 +558,29 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[rgba(23,20,17,0.08)] to-transparent" />
                 </div>
                 <div className="p-5">
-                  <h3 className="font-display text-3xl font-bold">{item.title}</h3>
+                  <h3 className="font-display text-3xl font-bold">
+                    {item.title}
+                  </h3>
                   <p className="mt-2 min-h-12 text-sm leading-6 text-[var(--ad-text-soft)]">
                     {item.note}
                   </p>
                   <a
-                    href="#contact"
+                    href={item.href}
                     className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-accent-dark)]"
                   >
-                    Request item <ArrowRight className="h-4 w-4" />
+                    Browse category <ArrowRight className="h-4 w-4" />
                   </a>
                 </div>
               </article>
             ))}
+          </div>
+          <div className="mt-8 flex justify-center">
+            <a
+              href="/collections"
+              className="inline-flex items-center justify-center gap-3 rounded-full bg-[var(--ad-black)] px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-white)] hover:bg-[var(--ad-accent-dark)]"
+            >
+              View All Products <ArrowRight className="h-4 w-4" />
+            </a>
           </div>
         </div>
       </section>
@@ -555,9 +600,9 @@ export default function Home() {
               </h2>
             </div>
             <p className="max-w-2xl text-base leading-8 text-[#d7cabb]">
-              Pre-order shopping depends on clarity. Arctic Daze keeps the process
-              simple: clear product request, clear quote, clear confirmation, and clear
-              communication until delivery.
+              Pre-order shopping depends on clarity. Arctic Daze keeps the
+              process simple: clear product request, clear quote, clear
+              confirmation, and clear communication until delivery.
             </p>
           </div>
 
@@ -571,7 +616,9 @@ export default function Home() {
                   {item.number}
                 </p>
                 <h3 className="mt-7 text-lg font-bold">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-[#cabcad]">{item.text}</p>
+                <p className="mt-3 text-sm leading-7 text-[#cabcad]">
+                  {item.text}
+                </p>
               </article>
             ))}
           </div>
@@ -628,17 +675,18 @@ export default function Home() {
               Browse the stores. We handle the sourcing.
             </h2>
             <p className="mt-6 text-base leading-8 text-[var(--ad-text-soft)]">
-              Explore supported Malaysian retailers, choose the item you want, and send
-              the product link to Arctic Daze. We check availability, prepare the
-              quote, and guide the pre-order.
+              Explore supported Malaysian retailers, choose the item you want,
+              and send the product link to Arctic Daze. We check availability,
+              prepare the quote, and guide the pre-order.
             </p>
             <div className="mt-8 rounded-3xl border border-[var(--ad-border)] bg-[rgba(255,250,242,0.72)] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--ad-muted)]">
                 Source-reference note
               </p>
               <p className="mt-3 text-sm leading-7 text-[var(--ad-text-soft)]">
-                Store and brand names are shown as source references only. Arctic Daze
-                does not claim official partnership unless specifically verified.
+                Store and brand names are shown as source references only.
+                Arctic Daze does not claim official partnership unless
+                specifically verified.
               </p>
             </div>
           </div>
@@ -649,7 +697,9 @@ export default function Home() {
                 key={group.title}
                 className="rounded-[1.6rem] border border-[var(--ad-border)] bg-[var(--ad-card)] p-6 shadow-[var(--shadow-soft)]"
               >
-                <h3 className="font-display text-3xl font-bold">{group.title}</h3>
+                <h3 className="font-display text-3xl font-bold">
+                  {group.title}
+                </h3>
                 <div className="mt-5 flex flex-col gap-2.5">
                   {group.stores.map((store) => (
                     <div
@@ -681,9 +731,9 @@ export default function Home() {
               </h2>
             </div>
             <p className="max-w-xl text-sm leading-7 text-[var(--ad-text-soft)]">
-              From sneakers and watches to fragrance and everyday menswear, customers
-              often ask us to source items from these popular labels and Malaysian
-              stores.
+              From sneakers and watches to fragrance and everyday menswear,
+              customers often ask us to source items from these popular labels
+              and Malaysian stores.
             </p>
           </div>
 
@@ -710,8 +760,9 @@ export default function Home() {
               Join the Arctic Daze Community
             </h2>
             <p className="mt-7 max-w-2xl text-base leading-8 text-[#d7cabb]">
-              Follow our Facebook page and group for new drops, weekly finds, restock
-              updates, Malaysian store picks, and men’s fashion inspiration.
+              Follow our Facebook page and group for new drops, weekly finds,
+              restock updates, Malaysian store picks, and men’s fashion
+              inspiration.
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -759,16 +810,24 @@ export default function Home() {
               Have a Product in Mind?
             </h2>
             <p className="mt-6 text-base leading-8 text-[var(--ad-text-soft)]">
-              Send us the product link, screenshot, or Facebook post. We will check
-              availability, prepare a quote, confirm the order details, and guide you
-              through the pre-order process.
+              Send us the product link, screenshot, or Facebook post. We will
+              check availability, prepare a quote, confirm the order details,
+              and guide you through the pre-order process.
             </p>
 
             <div className="mt-8 grid gap-4">
               {[
-                ["Messenger / WhatsApp", "Best for quick product requests.", MessageCircle],
+                [
+                  "Messenger / WhatsApp",
+                  "Best for quick product requests.",
+                  MessageCircle,
+                ],
                 ["Email Support", "Best for detailed order questions.", Mail],
-                ["Phone Confirmation", "Add your number for quote and delivery updates.", Phone],
+                [
+                  "Phone Confirmation",
+                  "Add your number for quote and delivery updates.",
+                  Phone,
+                ],
               ].map(([title, text, Icon]) => {
                 const ContactIcon = Icon as typeof MessageCircle;
 
@@ -866,8 +925,8 @@ export default function Home() {
             </button>
 
             <p className="mt-4 text-center text-xs leading-6 text-[var(--ad-muted)]">
-              We will contact you with availability and quote details before confirming
-              any order.
+              We will contact you with availability and quote details before
+              confirming any order.
             </p>
           </form>
         </div>
@@ -881,8 +940,8 @@ export default function Home() {
                 ARCTIC DAZE
               </p>
               <p className="mt-5 max-w-sm text-sm leading-7 text-[#cabcad]">
-                Premium men’s fashion and lifestyle products sourced from Malaysian
-                stores for customers in Bangladesh.
+                Premium men’s fashion and lifestyle products sourced from
+                Malaysian stores for customers in Bangladesh.
               </p>
             </div>
 
@@ -892,10 +951,31 @@ export default function Home() {
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-[var(--ad-accent-soft)]">
                     {column.title}
                   </p>
+
                   <div className="mt-5 grid gap-3">
                     {column.links.map((link) => (
                       <a
-                        href="#top"
+                        href={
+                          link === "New In"
+                            ? "/collections"
+                            : link === "Clothing"
+                              ? "/category/men-shirts-polos"
+                              : link === "Footwear"
+                                ? "/category/sneakers"
+                                : link === "Accessories"
+                                  ? "/category/accessories"
+                                  : link === "Grooming"
+                                    ? "/category/daily-essentials"
+                                    : link === "How to Order"
+                                      ? "/#process"
+                                      : link === "Malaysian Stores"
+                                        ? "/#stores"
+                                        : link === "Community"
+                                          ? "/#community"
+                                          : link === "Contact"
+                                            ? "/#contact"
+                                            : "/collections"
+                        }
                         key={link}
                         className="text-sm text-[#cabcad] hover:text-[var(--ad-white)]"
                       >
@@ -912,8 +992,8 @@ export default function Home() {
                 Join the Journey
               </p>
               <p className="mt-5 text-sm leading-7 text-[#cabcad]">
-                Sign up for early access, weekly finds, store updates, and exclusive
-                offers.
+                Sign up for early access, weekly finds, store updates, and
+                exclusive offers.
               </p>
               <div className="mt-5 flex overflow-hidden rounded-full border border-white/15 bg-white/5">
                 <input
