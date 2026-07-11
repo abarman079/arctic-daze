@@ -1,12 +1,11 @@
-import { Heart } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ProductCard } from "@/components/products/product-card";
-import { RemoveWishlistButton } from "@/components/wishlist/remove-wishlist-button";
-import { getWishlistProducts } from "@/lib/wishlist/queries";
+import { SavedDraftCard } from "@/components/saved-items/saved-draft-card";
+import { getSavedOrderDrafts } from "@/lib/saved-items/queries";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function AccountWishlistPage() {
+export default async function SavedItemsPage() {
   const supabase = await createClient();
 
   const {
@@ -14,41 +13,41 @@ export default async function AccountWishlistPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login?redirectTo=/account/wishlist");
+    redirect("/login?redirectTo=/account/saved-items");
   }
 
-  const products = await getWishlistProducts(user.id);
+  const drafts = await getSavedOrderDrafts(user.id);
 
   return (
     <div className="min-w-0">
       <section className="paper-panel rounded-[2rem] border border-[var(--ad-border)] p-7 shadow-[var(--shadow-soft)] sm:p-10 lg:p-12">
         <p className="text-xs font-bold uppercase tracking-[0.26em] text-[var(--ad-accent)]">
-          Wishlist
+          Saved Items
         </p>
 
         <h1 className="font-display mt-4 max-w-4xl break-words text-[clamp(2.8rem,6vw,6rem)] font-bold leading-[0.92] tracking-[-0.05em]">
-          Saved Arctic Daze finds.
+          Prepare an order before confirming.
         </h1>
 
         <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--ad-text-soft)]">
-          Save products you like, return later, or create an order draft before
-          requesting a quote.
+          Save size, color, quantity, and product notes. A saved draft is not
+          an order and does not reserve supplier stock.
         </p>
       </section>
 
-      {products.length === 0 ? (
+      {drafts.length === 0 ? (
         <section className="mt-6 rounded-[2rem] border border-[var(--ad-border)] bg-[var(--ad-card)] p-8 text-center shadow-[var(--shadow-soft)] sm:p-12">
           <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--ad-accent-soft)] text-[var(--ad-accent-dark)]">
-            <Heart className="h-6 w-6" />
+            <Bookmark className="h-6 w-6" />
           </span>
 
           <h2 className="font-display mt-6 text-4xl font-bold tracking-[-0.04em]">
-            Your wishlist is empty.
+            No saved order drafts yet.
           </h2>
 
           <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[var(--ad-text-soft)]">
-            Save your favorite Arctic Daze finds and return when you are ready
-            to request a quote.
+            Open a product and choose Save Order Draft to prepare your size,
+            color, quantity, and notes.
           </p>
 
           <Link
@@ -59,13 +58,9 @@ export default async function AccountWishlistPage() {
           </Link>
         </section>
       ) : (
-        <section className="mt-6 grid grid-cols-1 gap-4 min-[430px]:grid-cols-2 xl:grid-cols-3">
-          {products.map((product) => (
-            <div key={product.id} className="grid gap-3">
-              <ProductCard product={product} />
-
-              <RemoveWishlistButton productId={product.id} />
-            </div>
+        <section className="mt-6 grid gap-5">
+          {drafts.map((draft) => (
+            <SavedDraftCard key={draft.id} draft={draft} />
           ))}
         </section>
       )}

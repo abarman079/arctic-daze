@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ProfileForm } from "@/components/account/profile-form";
 import { createClient } from "@/lib/supabase/server";
@@ -23,41 +22,25 @@ export default async function AccountProfilePage() {
     .maybeSingle();
 
   return (
-    <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12">
-      <div className="mx-auto max-w-[900px]">
-        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <Link
-            href="/account"
-            className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--ad-accent-dark)] hover:underline"
-          >
-            ← Back to account
-          </Link>
+    <div className="min-w-0">
+      <section className="paper-panel rounded-[2rem] border border-[var(--ad-border)] p-7 shadow-[var(--shadow-soft)] sm:p-10 lg:p-12">
+        <p className="text-xs font-bold uppercase tracking-[0.26em] text-[var(--ad-accent)]">
+          Profile
+        </p>
 
-          <Link
-            href="/"
-            className="font-display text-2xl font-bold tracking-[0.16em]"
-          >
-            ARCTIC DAZE
-          </Link>
-        </div>
+        <h1 className="font-display mt-4 max-w-4xl break-words text-[clamp(2.8rem,6vw,6rem)] font-bold leading-[0.92] tracking-[-0.05em]">
+          Your contact details.
+        </h1>
 
-        <section className="paper-panel rounded-[2rem] border border-[var(--ad-border)] p-7 shadow-[var(--shadow-soft)] sm:p-10 lg:p-12">
-          <p className="text-xs font-bold uppercase tracking-[0.26em] text-[var(--ad-accent)]">
-            Profile
-          </p>
-          <h1 className="font-display mt-4 text-[clamp(2.7rem,5vw,5.2rem)] font-bold leading-[0.94] tracking-[-0.045em]">
-            Your contact details.
-          </h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--ad-text-soft)]">
-            Add your phone, WhatsApp, Messenger link, and preferred contact method.
-            This helps Arctic Daze confirm quotes and pre-order updates clearly.
-          </p>
+        <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--ad-text-soft)]">
+          Add your phone, WhatsApp, Messenger link, and preferred contact
+          method. These details will later prefill the pre-order form.
+        </p>
+      </section>
 
-          <div className="mt-8">
-            <ProfileForm userId={user.id} profile={profile} />
-          </div>
-        </section>
-      </div>
-    </main>
+      <section className="mt-6 rounded-[2rem] border border-[var(--ad-border)] bg-[var(--ad-card)] p-6 shadow-[var(--shadow-soft)] sm:p-8 lg:p-10">
+        <ProfileForm userId={user.id} profile={profile} />
+      </section>
+    </div>
   );
 }

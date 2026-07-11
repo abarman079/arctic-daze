@@ -1,9 +1,5 @@
-import {
-  ArrowRight,
-  CheckCircle2,
-  Clock,
-  ExternalLink,
-} from "lucide-react";
+import { SaveDraftButton } from "@/components/saved-items/save-draft-button";
+import { ArrowRight, CheckCircle2, Clock, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductGrid } from "@/components/products/product-grid";
@@ -198,6 +194,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   productId={product.id}
                   productTitle={product.title}
                   variant="full"
+                />
+                <SaveDraftButton
+                  productId={product.id}
+                  productSlug={product.slug}
                 />
 
                 {product.facebook_url ? (

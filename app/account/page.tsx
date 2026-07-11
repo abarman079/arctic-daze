@@ -1,8 +1,15 @@
-import { CheckCircle2 } from "lucide-react";
+import {
+  ArrowRight,
+  BellRing,
+  Bookmark,
+  Heart,
+  PackageSearch,
+  UserRound,
+} from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
-
-import { SignOutButton } from "@/components/auth/sign-out-button";
 import { PendingWishlistHandler } from "@/components/wishlist/pending-wishlist-handler";
+import { getAccountOverview } from "@/lib/account/queries";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AccountPage() {
@@ -16,97 +23,166 @@ export default async function AccountPage() {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name, phone, preferred_contact_method, role")
-    .eq("id", user.id)
-    .maybeSingle();
+  const [{ data: profile }, overview] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select(
+        "full_name, phone, messenger_url, whatsapp, preferred_contact_method",
+      )
+      .eq("id", user.id)
+      .maybeSingle(),
+
+    getAccountOverview(user.id),
+  ]);
+
+  const profileFields = [
+    profile?.full_name,
+    profile?.phone,
+    profile?.preferred_contact_method,
+  ];
+
+  const completedFields = profileFields.filter(Boolean).length;
+  const profileCompletion = Math.round(
+    (completedFields / profileFields.length) * 100,
+  );
+
+  const stats = [
+    {
+      title: "Wishlist",
+      value: overview.wishlistCount,
+      text: "Products saved for later.",
+      href: "/account/wishlist",
+      icon: Heart,
+    },
+    {
+      title: "Saved Drafts",
+      value: overview.savedDraftCount,
+      text: "Order details saved before confirmation.",
+      href: "/account/saved-items",
+      icon: Bookmark,
+    },
+    {
+      title: "Restock Alerts",
+      value: overview.restockAlertCount,
+      text: "Product availability notifications.",
+      href: "/collections",
+      icon: BellRing,
+    },
+  ];
 
   return (
-    <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12">
-      <div className="mx-auto max-w-[1200px]">
-        <header className="flex flex-col justify-between gap-5 border-b border-[var(--ad-border)] pb-8 sm:flex-row sm:items-center">
-          <a href="/" className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--ad-border-strong)] bg-[var(--ad-card)] text-xs font-bold tracking-[0.18em] text-[var(--ad-accent-dark)]">
-              AD
-            </span>
-            <span className="font-display text-2xl font-bold tracking-[0.16em] text-[var(--ad-text)] sm:text-3xl">
-              ARCTIC DAZE
-            </span>
-          </a>
+    <div className="min-w-0">
+      <section className="paper-panel rounded-[2rem] border border-[var(--ad-border)] p-7 shadow-[var(--shadow-soft)] sm:p-10 lg:p-12">
+        <p className="text-xs font-bold uppercase tracking-[0.26em] text-[var(--ad-accent)]">
+          Customer Dashboard
+        </p>
 
-          <SignOutButton />
-        </header>
+        <h1 className="font-display mt-4 max-w-4xl break-words text-[clamp(2.8rem,6vw,6rem)] font-bold leading-[0.92] tracking-[-0.05em]">
+          Welcome{profile?.full_name ? `, ${profile.full_name}` : ""}.
+        </h1>
 
-        <section className="paper-panel mt-10 rounded-[2rem] border border-[var(--ad-border)] p-7 shadow-[var(--shadow-soft)] sm:p-10 lg:p-14">
-          <p className="text-xs font-bold uppercase tracking-[0.26em] text-[var(--ad-accent)]">
-            Customer Dashboard
-          </p>
+        <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--ad-text-soft)]">
+          Manage your saved products, order drafts, contact details, and future
+          pre-order updates from one place.
+        </p>
 
-          <h1 className="font-display mt-4 text-[clamp(2.7rem,5.5vw,5.8rem)] font-bold leading-[0.92] tracking-[-0.045em]">
-            Your Arctic Daze account.
-          </h1>
+        <PendingWishlistHandler />
+      </section>
 
-          <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--ad-text-soft)]">
-            Manage your profile, wishlist, saved products, pre-order requests,
-            and account details from your Arctic Daze dashboard.
-          </p>
+      <section className="mt-6 grid gap-4 md:grid-cols-3">
+        {stats.map((item) => {
+          const Icon = item.icon;
 
-          <PendingWishlistHandler />
+          return (
+            <Link
+              key={item.title}
+              href={item.href}
+              className="ad-lift rounded-[1.6rem] border border-[var(--ad-border)] bg-[var(--ad-card)] p-6 shadow-[var(--shadow-soft)]"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--ad-accent-soft)] text-[var(--ad-accent-dark)]">
+                  <Icon className="h-5 w-5" />
+                </span>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
-            {[
-              {
-                title: "Signed In",
-                text: user.email || "Authenticated customer",
-              },
-              {
-                title: "Profile",
-                text: profile?.full_name || "Profile will be completed later",
-              },
-              {
-                title: "Role",
-                text: profile?.role || "customer",
-              },
-            ].map((item) => (
-              <article
-                key={item.title}
-                className="rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-6"
-              >
-                <CheckCircle2 className="h-5 w-5 text-[var(--ad-accent)]" />
+                <span className="font-display text-4xl font-bold">
+                  {item.value}
+                </span>
+              </div>
 
-                <h2 className="mt-5 text-sm font-bold uppercase tracking-[0.16em]">
-                  {item.title}
-                </h2>
+              <h2 className="mt-7 text-lg font-bold">{item.title}</h2>
 
-                <p className="mt-3 text-sm leading-7 text-[var(--ad-text-soft)]">
-                  {item.text}
-                </p>
-              </article>
-            ))}
+              <p className="mt-2 text-sm leading-7 text-[var(--ad-text-soft)]">
+                {item.text}
+              </p>
+
+              <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-accent-dark)]">
+                Open <ArrowRight className="h-4 w-4" />
+              </span>
+            </Link>
+          );
+        })}
+      </section>
+
+      <section className="mt-6 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+        <article className="rounded-[2rem] border border-[var(--ad-border)] bg-[var(--ad-card)] p-7 shadow-[var(--shadow-soft)] sm:p-8">
+          <div className="flex items-center gap-3">
+            <UserRound className="h-5 w-5 text-[var(--ad-accent)]" />
+
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--ad-muted)]">
+              Profile progress
+            </p>
           </div>
-        </section>
 
-        <section className="mt-6 grid gap-4 md:grid-cols-3">
-          <a
+          <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.04em]">
+            {profileCompletion}% complete
+          </h2>
+
+          <div className="mt-5 h-2 overflow-hidden rounded-full bg-[var(--ad-bg-soft)]">
+            <div
+              className="h-full rounded-full bg-[var(--ad-accent)]"
+              style={{
+                width: `${profileCompletion}%`,
+              }}
+            />
+          </div>
+
+          <p className="mt-5 text-sm leading-7 text-[var(--ad-text-soft)]">
+            Complete your phone and contact preference so Arctic Daze can send
+            quote and delivery updates clearly.
+          </p>
+
+          <Link
             href="/account/profile"
-            className="rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-6 text-sm font-semibold text-[var(--ad-text-soft)] hover:-translate-y-1 hover:border-[var(--ad-accent)]"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--ad-black)] px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-white)] hover:bg-[var(--ad-accent-dark)]"
           >
-            Edit your contact profile
-          </a>
+            Edit Profile <ArrowRight className="h-4 w-4" />
+          </Link>
+        </article>
 
-          <a
-            href="/account/wishlist"
-            className="rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-6 text-sm font-semibold text-[var(--ad-text-soft)] hover:-translate-y-1 hover:border-[var(--ad-accent)]"
+        <article className="dark-panel rounded-[2rem] p-7 text-[var(--ad-white)] shadow-[var(--shadow-strong)] sm:p-8">
+          <PackageSearch className="h-7 w-7 text-[var(--ad-accent-soft)]" />
+
+          <p className="mt-7 text-xs font-bold uppercase tracking-[0.22em] text-[var(--ad-accent-soft)]">
+            Next customer feature
+          </p>
+
+          <h2 className="font-display mt-4 text-4xl font-bold leading-none tracking-[-0.04em]">
+            Pre-order tracking arrives in Phase 5.
+          </h2>
+
+          <p className="mt-5 text-sm leading-7 text-[#cabcad]">
+            Submitted requests will later show quote, payment, sourcing,
+            transit, arrival, and delivery status here.
+          </p>
+
+          <Link
+            href="/account/preorders"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--ad-white)] px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ad-black)]"
           >
-            View your wishlist
-          </a>
-
-          <div className="rounded-3xl border border-[var(--ad-border)] bg-[var(--ad-card)] p-6 text-sm font-semibold text-[var(--ad-text-soft)]">
-            Pre-order requests coming in Phase 5
-          </div>
-        </section>
-      </div>
-    </main>
+            View Pre-Orders <ArrowRight className="h-4 w-4" />
+          </Link>
+        </article>
+      </section>
+    </div>
   );
 }
